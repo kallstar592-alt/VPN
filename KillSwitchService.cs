@@ -36,8 +36,8 @@ public sealed class KillSwitchService
 
         var script = $$"""
 $ErrorActionPreference = 'Stop'
-$statePath = {{state}}
-$group = {{group}}
+$statePath = {{{state}}}
+$group = {{{group}}}
 if (Test-Path -LiteralPath $statePath) { throw 'A previous firewall snapshot exists. Restore it before enabling a new kill switch.' }
 $profiles = @(Get-NetFirewallProfile | Select-Object @{Name='Name';Expression={$_.Name}}, @{Name='DefaultOutboundAction';Expression={$_.DefaultOutboundAction.ToString()}})
 $rules = @(Get-NetFirewallRule -Direction Outbound -Action Allow -Enabled True | Where-Object { $_.Group -ne $group } | Select-Object -ExpandProperty Name -Unique)
@@ -46,8 +46,8 @@ $snapshot | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $statePath -Encod
 try {
     Get-NetFirewallRule -Direction Outbound -Action Allow -Enabled True | Where-Object { $_.Group -ne $group } | Disable-NetFirewallRule
     Set-NetFirewallProfile -Profile Domain,Private,Public -DefaultOutboundAction Block
-    New-NetFirewallRule -DisplayName 'VPN Client Kill Switch - OpenVPN endpoint' -Group $group -Direction Outbound -Action Allow -Profile Any -Program {{exe}} -RemoteAddress {{endpointList}} | Out-Null
-    New-NetFirewallRule -DisplayName 'VPN Client Kill Switch - tunnel adapter' -Group $group -Direction Outbound -Action Allow -Profile Any -InterfaceAlias {{adapter}} | Out-Null
+    New-NetFirewallRule -DisplayName 'VPN Client Kill Switch - OpenVPN endpoint' -Group $group -Direction Outbound -Action Allow -Profile Any -Program {{{exe}}} -RemoteAddress {{{endpointList}}} | Out-Null
+    New-NetFirewallRule -DisplayName 'VPN Client Kill Switch - tunnel adapter' -Group $group -Direction Outbound -Action Allow -Profile Any -InterfaceAlias {{{adapter}}} | Out-Null
 }
 catch {
     try {
@@ -72,8 +72,8 @@ catch {
         var group = QuotePowerShell(RuleGroup);
         var script = $$"""
 $ErrorActionPreference = 'Stop'
-$statePath = {{state}}
-$group = {{group}}
+$statePath = {{{state}}}
+$group = {{{group}}}
 if (-not (Test-Path -LiteralPath $statePath)) { exit 0 }
 $snapshot = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
 Get-NetFirewallRule -Group $group -ErrorAction SilentlyContinue | Remove-NetFirewallRule
