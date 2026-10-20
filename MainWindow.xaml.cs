@@ -1,4 +1,8 @@
 using Microsoft.Win32;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Windows;
@@ -238,7 +242,6 @@ public partial class MainWindow : Window
             MessageBox.Show("There is no saved kill-switch firewall state to restore.", "Firewall already restored", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-        KillSwitchBox.IsChecked = false;
         await RestoreKillSwitchAsync();
     }
 

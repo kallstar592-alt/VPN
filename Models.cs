@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace VPN;
 
 public enum VpnProtocol { Auto, IKEv2, OpenVPN }
