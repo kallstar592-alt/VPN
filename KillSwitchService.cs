@@ -34,7 +34,7 @@ public sealed class KillSwitchService
         var adapter = QuotePowerShell(tunnelInterfaceAlias);
         var endpointList = QuotePowerShell(string.Join(",", endpoints));
 
-        var script = $$"""
+        var script = $$$"""
 $ErrorActionPreference = 'Stop'
 $statePath = {{{state}}}
 $group = {{{group}}}
@@ -70,7 +70,7 @@ catch {
         if (!IsActive) return;
         var state = QuotePowerShell(_statePath);
         var group = QuotePowerShell(RuleGroup);
-        var script = $$"""
+        var script = $$$"""
 $ErrorActionPreference = 'Stop'
 $statePath = {{{state}}}
 $group = {{{group}}}
