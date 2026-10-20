@@ -1,0 +1,29 @@
+name: Build Windows VPN
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Publish Windows x64
+        run: dotnet publish -c Release -r win-x64 --self-contained false -o publish
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: VPN-windows-x64
+          path: publish/
