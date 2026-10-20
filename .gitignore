@@ -1,0 +1,14 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+publish/
+artifacts/
+*.ovpn
+*.key
+*.p12
+*.pfx
+*.pem
