@@ -74,7 +74,7 @@ public partial class MainWindow : Window
             LatencyText.Text = "Reference location only — add a real provider hostname/configuration.";
         }
 
-        ConnectButton.Content = _vpn.IsConnected ? "DISCONNECT" : "CONNECT";
+        ConnectButton.Content = (_vpn.IsConnected || _vpn.OpenVpnProcessRunning) ? "DISCONNECT" : "CONNECT";
         ConnectButton.IsEnabled = !_busy;
         ConnectButton.Opacity = _busy ? 0.65 : 1;
 
@@ -113,7 +113,7 @@ public partial class MainWindow : Window
     private async void Connect_Click(object sender, RoutedEventArgs e)
     {
         if (_busy) return;
-        if (_vpn.IsConnected)
+        if (_vpn.IsConnected || _vpn.OpenVpnProcessRunning)
         {
             _manualDisconnect = true;
             _busy = true;
@@ -269,7 +269,7 @@ public partial class MainWindow : Window
         }
         RefreshSelection();
         if (!_vpn.IsConnected && !_manualDisconnect && ReconnectBox.IsChecked == true &&
-            _vpn.ActiveProfile is { Protocol: VpnProtocol.OpenVPN } profile && !_reconnecting)
+            _vpn.ActiveProfile is { Protocol: VpnProtocol.OpenVPN } profile && !_vpn.OpenVpnProcessRunning && !_reconnecting)
             _ = ReconnectUntilConnectedAsync(profile);
     }
 
@@ -278,7 +278,7 @@ public partial class MainWindow : Window
         _reconnecting = true;
         try
         {
-            while (!_manualDisconnect && !_vpn.IsConnected && ReconnectBox.IsChecked == true && _vpn.ActiveProfile is not null)
+            while (!_manualDisconnect && !_vpn.IsConnected && !_vpn.OpenVpnProcessRunning && ReconnectBox.IsChecked == true && _vpn.ActiveProfile is not null)
             {
                 _vpn.CurrentState = "Waiting 4 seconds before reconnecting…";
                 RefreshSelection();

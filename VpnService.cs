@@ -19,6 +19,7 @@ public sealed class VpnService
     public VpnProfile? ActiveProfile { get; private set; }
     public string CurrentState { get; set; } = "Disconnected";
     public string? OpenVpnExecutable { get; private set; }
+    public bool OpenVpnProcessRunning => _openVpn is { HasExited: false };
     public string? TunnelInterfaceAlias => FindTunnelInterfaceAlias();
     public event EventHandler? StateChanged;
 
@@ -62,6 +63,7 @@ public sealed class VpnService
 
     private async Task ConnectOpenVpnAsync(VpnProfile profile, CancellationToken token)
     {
+        if (_openVpn is not null) await StopOpenVpnAsync();
         if (!File.Exists(profile.ConfigPath)) throw new FileNotFoundException("OpenVPN configuration was not found.", profile.ConfigPath);
         OpenVpnExecutable = FindOpenVpn();
         if (OpenVpnExecutable is null) throw new FileNotFoundException("OpenVPN Community for Windows was not found. Install it first, then retry.");
