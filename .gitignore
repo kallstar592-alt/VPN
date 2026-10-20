@@ -1,14 +1,25 @@
+# Build output
 bin/
 obj/
-.vs/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
 publish/
 artifacts/
+*.user
+*.suo
+.vs/
+
+# VPN configurations and secrets
 *.ovpn
-*.key
+*.conf
 *.p12
 *.pfx
+*.key
 *.pem
+*.crt
+*.cer
+*.mobileconfig
+auth.txt
+credentials.txt
+
+# Local app state / packages
+VPN-Windows-x64.zip
+*.log

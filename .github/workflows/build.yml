@@ -3,8 +3,13 @@ name: Build Windows VPN
 on:
   push:
     branches: [ main ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -17,13 +22,27 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore .\VPN.csproj
       - name: Build
-        run: dotnet build -c Release --no-restore
-      - name: Publish Windows x64
-        run: dotnet publish -c Release -r win-x64 --self-contained false -o publish
-      - name: Upload build
+        run: dotnet build .\VPN.csproj -c Release --no-restore
+      - name: Publish self-contained Windows x64
+        run: dotnet publish .\VPN.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o .\publish
+      - name: Create zip package
+        shell: pwsh
+        run: Compress-Archive -Path .\publish\* -DestinationPath .\VPN-Windows-x64.zip -Force
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: VPN-windows-x64
-          path: publish/
+          name: VPN-Windows-x64
+          path: |
+            VPN-Windows-x64.zip
+            publish/VPN.exe
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish GitHub Release for version tags
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: VPN \${{ github.ref_name }}
+          files: VPN-Windows-x64.zip
+          generate_release_notes: true
